@@ -1,0 +1,84 @@
+name: Single TF Module
+
+on:
+  workflow_dispatch:
+    inputs:
+      module:
+        description: Module to run
+        type: choice
+        default: simple-tenant
+        options:
+        - simple-tenant
+      cmd:
+        description: Command to run
+        type: choice
+        default: plan
+        options:
+        - plan
+        - apply
+        - destroy
+      environment:
+        description: Environment to deploy to
+        type: environment
+        default: qa-aws
+      workspace:
+        description: Workspace to run
+        type: string
+      
+  workflow_call:
+    inputs:
+      cmd:
+        description: Command to run
+        type: string
+        default: plan
+      environment:
+        description: Environment to deploy to
+        type: string
+        default: dev
+      module:
+        description: Module to run
+        type: string
+        default: admin-tenant
+      workspace:
+        description: Workspace to run
+        type: string
+        default: default
+    secrets:
+      DUPLO_TOKEN:
+        description: Duplo Token
+        required: true
+jobs:
+  module:
+    name: Module
+    runs-on: ubuntu-latest
+    environment: 
+      name: ${{ inputs.environment }}
+    env:
+      DUPLO_TOKEN: ${{ secrets.DUPLO_TOKEN }}
+      DUPLO_HOST: ${{ vars.DUPLO_HOST }}
+      DUPLO_TENANT: ${{ vars.DUPLO_TENANT }}
+      TF_CLI_ARGS_apply: -parallelism=1
+    steps:
+
+    - name: Checkout source code
+      uses: actions/checkout@v3
+
+    - name: Duplo and AWS Setup
+      uses: duplocloud/actions/setup@main
+    
+    - name: Terraform Setup
+      uses: duplocloud/actions/setup-terraform@main
+
+    - name: TF Validate Module
+      uses: duplocloud/actions/terraform-module@main
+      with:
+        module: modules/${{ inputs.module }}
+        test: false
+
+    - name: TF Execute Module
+      uses: duplocloud/actions/terraform-exec@main
+      with:
+        module: modules/${{ inputs.module }}
+        workspace: ${{ inputs.workspace }}
+        command: ${{ inputs.cmd }}
+
