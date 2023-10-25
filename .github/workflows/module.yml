@@ -49,7 +49,7 @@ on:
         required: true
 jobs:
   module:
-    name: Module
+    name: ${{ inputs.cmd }} ${{ inputs.workspace }} ${{ inputs.module }}
     runs-on: ubuntu-latest
     environment: 
       name: ${{ inputs.environment }}
