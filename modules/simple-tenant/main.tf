@@ -1,5 +1,5 @@
 locals {
-  tenant_name        = terraform.workspace
+  tenant_name = terraform.workspace
 }
 
 data "duplocloud_infrastructure" "current" {
