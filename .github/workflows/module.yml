@@ -61,10 +61,12 @@ jobs:
     steps:
 
     - name: Checkout source code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Duplo and AWS Setup
       uses: duplocloud/actions/setup@main
+      with:
+        admin: true
     
     - name: Terraform Setup
       uses: duplocloud/actions/setup-terraform@main
